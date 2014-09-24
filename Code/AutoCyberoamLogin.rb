@@ -30,71 +30,36 @@ require 'gibberish' if $windows
 
 
 #-----User Information Methods--------------#
+    require 'pstore'
+    $store = PStore.new(File.join(  ENV['HOME'] ,".userdetails.pstore"))
+
     def cache_details(username , password)   
-       repeating_seconds = get_repeating_seconds
-       file = File.new($filepath ,"w:UTF-8") 
-         file.puts "username::>#{username}"
-         file.puts "password::>#{encrypt(password)}"
-         file.puts "repeating_seconds::>#{repeating_seconds}" if not repeating_seconds.strip.empty?
-       file.close
+       $store.transaction{ $store[:username] =  username}
+       $store.transaction{ $store[:password] =  encrypt(password) }
     end
 
     def save_repeating_time(repeating_seconds)
        username = get_username
        password = get_password
        if( (not username.empty?) and (not password.empty?) )
-           file = File.new($filepath , "w:UTF-8") 
-             file.puts "username::>#{username}"
-             file.puts "password::>#{encrypt(password)}"
-             file.puts "repeating_seconds::>#{repeating_seconds}"
-           file.close
+           $store.transaction{ $store[:repeating_seconds] =  repeating_seconds}
            return true
         else
            return false
         end
     end
     def unsave_repeating_time
-       username = get_username
-       password = get_password
-       if( (not username.empty?) and (not password.empty?) )
-           file = File.new($filepath , "w:UTF-8") 
-             file.puts "username::>#{username}"
-             file.puts "password::>#{encrypt(password)}"
-           file.close
-        end
+       $store.transaction{ $store[:repeating_seconds] =  nil }       
     end
     def get_username
-      return "" if not File.exists?($filepath)
-      file = File.new( $filepath ,"r:UTF-8") rescue nil
-      if not file.nil? and file.stat.readable?
-                file.each_line do |line| 
-                        return line.strip.split('::>')[1].chomp.to_s if line.include?('username::>')
-                end
-                return ""
-      end
-      return ""
+        $store.transaction{ $store[:username] } || ""
     end
     def get_password
-      return "" if not File.exists?($filepath)
-      file = File.new( $filepath , "r:UTF-8") rescue nil
-      if not file.nil? and file.stat.readable?
-              file.each_line do |line| 
-                      return decrypt(line.strip.split('::>')[1].chomp.to_s) if line.include?('password::>')
-        end
-        return ""
-      end
-      return ""
+        encrypted_password = $store.transaction{ $store[:password] } || ""
+        decrypt(encrypted_password) rescue ""
     end
     def get_repeating_seconds
-      return "" if not File.exists?($filepath)
-      file = File.new( $filepath , "r:UTF-8") rescue nil
-      if not file.nil? and file.stat.readable?
-          file.each_line do |line| 
-            return line.strip.split('::>')[1].chomp.to_s if line.include?('repeating_seconds::>')
-          end
-          return ""
-      end
-      return ""
+        $store.transaction{ $store[:repeating_seconds] } || ""
     end
 #-------------------------------------------#
 
@@ -113,7 +78,7 @@ require 'gibberish' if $windows
     end
 #-------------------------------------------#
 
-$filepath = File.join(  ENV['HOME'] ,".userdetails")
+
 $repeating_seconds = -1
 $showtimer = false
 $repeating_seconds = get_repeating_seconds.to_s rescue ""
@@ -131,10 +96,10 @@ end
     logout_curl = "curl --silent 'https://10.100.56.55:8090/logout.xml' -H 'Host: 10.100.56.55:8090' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' -H 'Accept-Language: en-US,en;q=0.5' -H 'Accept-Encoding: gzip, deflate' -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' -H 'Referer: https://10.100.56.55:8090/httpclient.html' -H 'Connection: keep-alive' -H 'Pragma: no-cache' -H 'Cache-Control: no-cache' --data 'mode=193&username=#{username}&a=1407179351402&producttype=0' -k --max-time 0.7"
 
     if login
-      loginresponse = `#{login_curl}`                 #works in linux shoes # Not works in windows shoes
+      loginresponse = `#{login_curl}`                 
       return loginresponse , (not loginresponse.empty? )
     else
-      logoutresponse = `#{logout_curl}`                 #Not works
+      logoutresponse = `#{logout_curl}`                 
       return logoutresponse , (not logoutresponse.empty? )
     end
   end
@@ -353,7 +318,7 @@ Shoes.app :title => "Auto Cyberoam Login" , :width => 340, :height => 490 , :scr
            border( "AAD271".."#3D6919", strokewidth: 6)
           stack :margin => 20 , :align => "center" do
              title("About!" , :align => "center" , :size =>25)
-             para("A cross platform cyberoam client developed by " , link("Harsh Trivedi" , :click =>  "http://github.com/HarshTrivedi") , " , (2012-2016) batch. \n Its a simple Ruby app built with Shoes toolkit. \n The App is open-sourced " , link("Here" , :click =>  "http://github.com/HarshTrivedi/AutoCyberoamLoginClient") , "\nPlease let me know in case of any bug or potential improvement!" , :align => "center" , :size => 10)
+             para("A cross platform cyberoam client developed by " , link("Harsh Trivedi" , :click =>  "http://github.com/HarshTrivedi") , " , (2012-2016) batch. \n Its a simple Ruby app built with Shoes toolkit. \n The App is open-sourced " , link("Here" , :click =>  "https://github.com/HarshTrivedi/Auto-Cyberoam-Login-Client") , "\nPlease let me know in case of any bug or potential improvement!" , :align => "center" , :size => 10)
              button "OK!" , :margin_left => "40%" , :margin_right => "40%" , :width => "100%" do
                 self.close
              end
