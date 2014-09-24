@@ -4,12 +4,12 @@ Shoes.setup do
  gem 'nori'
  gem 'nokogiri'
  gem 'gibberish' 
- gem 'libnotify' if $windows
+ gem 'libnotify' if not $windows
 end
 require 'nori'
 require 'nokogiri'
-require 'libnotify'
-require 'gibberish' if $windows
+require 'libnotify' if not $windows
+require 'gibberish' 
 
 
 #-----Notification related methods----------#
