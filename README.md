@@ -22,3 +22,11 @@ To Dos:
 7. Package and Deploy executables :)
 
 8. Try to shift the app to Shoes4, may be the windows popup problem might get solved then. BTW, open an issue for that to in Shoes 3.2 as suggested by Cecil.
+
+9. Find a smarter way for keeping windows and linux code different.
+
+10. Update help links for widows users.
+
+11. Update executables so that, they install app:-> (setup icon , setup HotKey and setup Dash)
+
+12. For linux, check for cron support and try to enable it for the required users.
