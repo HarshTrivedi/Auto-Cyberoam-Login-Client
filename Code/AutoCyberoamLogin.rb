@@ -1,20 +1,21 @@
+
 $windows = Gem.win_platform?
 
 Shoes.setup do
  gem 'nori'
  gem 'nokogiri'
  gem 'gibberish' 
- gem 'libnotify' if not $windows
+ gem 'libnotify' if not Gem.win_platform?
 end
 require 'nori'
 require 'nokogiri'
-require 'libnotify' if not $windows
+require 'libnotify' if not Gem.win_platform?
 require 'gibberish' 
 
 
 #-----Notification related methods----------#
     def show_notification(title , body)
-      if not $windows
+      if not Gem.win_platform?
         notification = Libnotify.new do |notify|
           notify.summary    = title
           notify.body       = body
@@ -92,8 +93,11 @@ end
 
 
   def cyberoam( username , password , login = true)
-    login_curl = "curl --silent 'https://10.100.56.55:8090/login.xml' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' -H 'Accept-Encoding: gzip, deflate' -H 'Accept-Language: en-US,en;q=0.5' -H 'Cache-Control: no-cache' -H 'Connection: keep-alive' -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' -H 'Host: 10.100.56.55:8090' -H 'Pragma: no-cache' -H 'Referer: https://10.100.56.55:8090/httpclient.html' --data 'mode=191&username=#{username}&password=#{password}&a=1407179385601&producttype=0' -k --max-time 0.7"
-    logout_curl = "curl --silent 'https://10.100.56.55:8090/logout.xml' -H 'Host: 10.100.56.55:8090' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' -H 'Accept-Language: en-US,en;q=0.5' -H 'Accept-Encoding: gzip, deflate' -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' -H 'Referer: https://10.100.56.55:8090/httpclient.html' -H 'Connection: keep-alive' -H 'Pragma: no-cache' -H 'Cache-Control: no-cache' --data 'mode=193&username=#{username}&a=1407179351402&producttype=0' -k --max-time 0.7"
+
+    data = "mode=191&username=#{username}&password=#{password}&a=1407179385601&producttype=0"
+    login_curl = 'curl --silent https://10.100.56.55:8090/login.xml -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" -H "Accept-Encoding: gzip, deflate" -H "Accept-Language: en-US,en;q=0.5" -H "Cache-Control: no-cache" -H "Connection: keep-alive" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Host: 10.100.56.55:8090" -H "Pragma: no-cache" -H "Referer: https://10.100.56.55:8090/httpclient.html" --data ' + '"' + data + '"' + ' -k --max-time 0.8'
+    data = "mode=193&username=#{username}&a=1407179351402&producttype=0"
+    logout_curl = 'curl --silent https://10.100.56.55:8090/logout.xml -H "Host: 10.100.56.55:8090" -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" -H "Accept-Language: en-US,en;q=0.5" -H "Accept-Encoding: gzip, deflate" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "Referer: https://10.100.56.55:8090/httpclient.html" -H "Connection: keep-alive" -H "Pragma: no-cache" -H "Cache-Control: no-cache" --data ' + '"' + data + '"' + '  -k --max-time 0.8'
 
     if login
       loginresponse = `#{login_curl}`                 
@@ -151,7 +155,7 @@ Shoes.app :title => "Auto Cyberoam Login" , :width => 340, :height => 490 , :scr
     self.close
   end
 
-  if not $windows
+  if not Gem.win_platform?
     pkill_installed = `pkill --version` rescue false
     if not pkill_installed
       alert("I am Unable to Run pkill command on your system. Please make sure you can run: pkill --version on your terminal.")
@@ -342,4 +346,7 @@ Shoes.app :title => "Auto Cyberoam Login" , :width => 340, :height => 490 , :scr
   end
 
 end
+
+
+
 
