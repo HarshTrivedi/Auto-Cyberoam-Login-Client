@@ -3,6 +3,17 @@ Auto-Cyberoam-Login-Client
 
 A simple ruby shoes app, acts as a cyberoam login client for DA-IICT student. 
 
+The executables, platform wise are hosted on:
+
+http://goo.gl/XMXzA9
+
+Choose the package according to your platform.
+This should definately work but in any case if it doesn't on your machine then use 'Shy' package.
+Shy package is a binary that can be run using shoes installation independent of the platform:
+For this you will need shoes installation which can be got from:
+https://shoesrb.com
+
+
 
 To Dos:
 ------
